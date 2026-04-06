@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل Windows Server الشامل — من الصفر</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #04080f;
+  --bg2: #070f1c;
+  --bg3: #0a1628;
+  --card: rgba(8,20,45,0.9);
+  --card2: rgba(6,15,35,0.95);
+  --border: rgba(0,180,255,0.12);
+  --border2: rgba(0,180,255,0.3);
+  --border3: rgba(0,180,255,0.5);
+  --cyan: #00b4ff;
+  --cyan2: #00d4ff;
+  --cyan3: #00f0ff;
+  --green: #00e5a0;
+  --green2: #00ff99;
+  --yellow: #ffcc00;
+  --orange: #ff8c00;
+  --red: #ff3355;
+  --purple: #a855f7;
+  --text: #b0cce0;
+  --text2: #6a90aa;
+  --text3: #3a607a;
+  --white: #e8f4ff;
+  --glow-c: 0 0 30px rgba(0,180,255,0.25);
+  --glow-g: 0 0 30px rgba(0,229,160,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+
+/* BG */
+.bg-fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-fx::before{content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 100% 60% at 10% 10%,rgba(0,80,180,0.1) 0%,transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 90%,rgba(0,180,255,0.07) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,40,100,0.08) 0%,transparent 70%)}
+.bg-fx::after{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,180,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,255,0.025) 1px,transparent 1px);
+  background-size:50px 50px}
+
+/* LAYOUT */
+.wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 16px 80px}
+
+/* HERO */
+.hero{padding:70px 20px 60px;text-align:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(0,180,255,0.08);border:1px solid var(--border2);color:var(--cyan);font-size:11px;font-weight:700;letter-spacing:3px;padding:7px 20px;border-radius:100px;margin-bottom:28px;text-transform:uppercase;animation:fd .6s ease both}
+.hero h1{font-size:clamp(26px,6vw,52px);font-weight:900;line-height:1.2;color:var(--white);margin-bottom:14px;animation:fd .7s ease both;text-shadow:0 0 80px rgba(0,180,255,0.25)}
+.hero h1 em{font-style:normal;color:var(--cyan)}
+.hero-desc{font-size:15px;color:var(--text2);max-width:560px;margin:0 auto 36px;line-height:1.9;animation:fd .8s ease both}
+.hero-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;animation:fd .9s ease both}
+.chip{background:rgba(0,180,255,0.06);border:1px solid var(--border);color:var(--text2);font-size:12px;padding:6px 14px;border-radius:8px;display:flex;align-items:center;gap:6px}
+.chip-dot{width:7px;height:7px;border-radius:50%}
+
+/* STICKY NAV */
+.nav{position:sticky;top:0;z-index:200;background:rgba(4,8,15,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:920px;margin:0 auto;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:8px 16px}
+.nav-inner::-webkit-scrollbar{display:none}
+.nbtn{flex-shrink:0;background:transparent;border:1px solid transparent;color:var(--text2);font-family:'Cairo',sans-serif;font-size:12px;font-weight:600;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.nbtn:hover,.nbtn.on{background:rgba(0,180,255,0.1);border-color:var(--border2);color:var(--cyan)}
+
+/* NETWORK DIAGRAM */
+.net-diagram{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:28px 20px;margin-bottom:40px;text-align:center}
+.net-title{font-size:12px;font-weight:700;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:24px}
+.net-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:20px}
+.net-node{background:rgba(0,180,255,0.05);border:1px solid var(--border2);border-radius:14px;padding:16px 10px;transition:all .3s}
+.net-node:hover{border-color:var(--border3);box-shadow:var(--glow-c);transform:translateY(-3px)}
+.net-node .ni{font-size:32px;margin-bottom:8px}
+.net-node .nn{font-size:13px;font-weight:700;color:var(--white)}
+.net-node .ns{font-size:11px;color:var(--cyan);margin-top:3px}
+.net-node .nip{font-size:11px;color:var(--text3);margin-top:4px;font-family:'JetBrains Mono',monospace}
+.net-line{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text3);font-size:12px;margin-top:12px}
+.net-line hr{flex:1;border:none;border-top:1px dashed var(--border2)}
+
+/* SECTION */
+.sec{margin-bottom:56px}
+.sec-hdr{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.sec-badge{min-width:44px;height:44px;background:linear-gradient(135deg,var(--cyan),#0055cc);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#000;box-shadow:var(--glow-c);flex-shrink:0}
+.sec-ttl{font-size:clamp(17px,4vw,23px);font-weight:900;color:var(--white)}
+.sec-sub{font-size:12px;color:var(--text2);margin-top:3px}
+
+/* PHASE BADGE */
+.phase{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:16px}
+.phase-dc{background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.3);color:#c084fc}
+.phase-fs{background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:var(--green)}
+.phase-ps{background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.3);color:var(--orange)}
+.phase-nas{background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.3);color:var(--cyan)}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:16px;position:relative;overflow:hidden;transition:border-color .3s,box-shadow .3s}
+.card::after{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle at top right,rgba(0,180,255,0.05),transparent 70%);pointer-events:none}
+.card:hover{border-color:rgba(0,180,255,0.25);box-shadow:0 4px 40px rgba(0,180,255,0.08)}
+.ctitle{font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.cicon{width:30px;height:30px;background:rgba(0,180,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:11px}
+.step{display:flex;gap:13px;align-items:flex-start}
+.sn{width:28px;height:28px;flex-shrink:0;background:rgba(0,180,255,0.08);border:1px solid rgba(0,180,255,0.25);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--cyan);margin-top:1px}
+.st{font-size:14px;line-height:1.75;color:var(--text);flex:1}
+.st code,.step code{font-family:'JetBrains Mono',monospace;background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.2);color:var(--cyan2);padding:1px 7px;border-radius:5px;font-size:12px}
+
+/* CODE BLOCK */
+.cb{background:rgba(0,0,0,0.6);border:1px solid rgba(0,180,255,0.2);border-radius:12px;padding:16px 16px 16px 60px;margin:10px 0;position:relative;direction:ltr}
+.cb pre{font-family:'JetBrains Mono',monospace;font-size:13px;color:#7dd3fc;line-height:1.7;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+.cb .lang{position:absolute;top:10px;right:14px;font-size:10px;color:var(--text3);font-family:'Cairo',sans-serif;font-weight:700;letter-spacing:1px}
+.cpbtn{position:absolute;top:10px;left:10px;background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.2);color:var(--text2);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:'Cairo',sans-serif;transition:all .2s}
+.cpbtn:hover{background:rgba(0,180,255,0.2);color:var(--cyan)}
+.cpbtn.ok{color:var(--green);border-color:var(--green)}
+
+/* TABLE */
+.tw{overflow-x:auto;border-radius:12px;border:1px solid var(--border);margin:12px 0}
+table{width:100%;border-collapse:collapse;min-width:380px}
+thead tr{background:rgba(0,180,255,0.08)}
+thead th{padding:12px 14px;font-size:12px;font-weight:700;color:var(--cyan);text-align:right;white-space:nowrap;border-bottom:1px solid var(--border2)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .2s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(0,180,255,0.03)}
+tbody td{padding:11px 14px;font-size:13px;color:var(--text);vertical-align:top;line-height:1.6}
+
+/* BADGES */
+.b{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:5px;white-space:nowrap}
+.bg{background:rgba(0,229,160,0.12);color:var(--green);border:1px solid rgba(0,229,160,0.25)}
+.br{background:rgba(255,51,85,0.12);color:var(--red);border:1px solid rgba(255,51,85,0.25)}
+.by{background:rgba(255,204,0,0.12);color:var(--yellow);border:1px solid rgba(255,204,0,0.25)}
+.bb{background:rgba(0,180,255,0.12);color:var(--cyan);border:1px solid rgba(0,180,255,0.25)}
+.bp{background:rgba(168,85,247,0.12);color:#c084fc;border:1px solid rgba(168,85,247,0.25)}
+.bo{background:rgba(255,140,0,0.12);color:var(--orange);border:1px solid rgba(255,140,0,0.25)}
+
+/* ALERTS */
+.al{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:10px;margin:12px 0;font-size:13px;line-height:1.75}
+.al-w{background:rgba(255,204,0,0.05);border:1px solid rgba(255,204,0,0.22);color:#d4aa00}
+.al-t{background:rgba(0,229,160,0.05);border:1px solid rgba(0,229,160,0.18);color:#00c985}
+.al-i{background:rgba(0,180,255,0.05);border:1px solid rgba(0,180,255,0.18);color:#0095cc}
+.al-r{background:rgba(255,51,85,0.05);border:1px solid rgba(255,51,85,0.18);color:#cc2244}
+.al-ic{font-size:18px;flex-shrink:0;margin-top:1px}
+
+/* TREE */
+.tree{background:rgba(0,0,0,0.45);border:1px solid var(--border);border-radius:10px;padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.9;direction:ltr}
+.tf{color:#fbbf24}.ts{color:#7dd3fc}.tl{color:rgba(0,180,255,0.35)}.tc{color:#6ee7b7}
+
+/* INFO GRID */
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:14px 0}
+.icard{background:rgba(0,180,255,0.04);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;transition:all .3s}
+.icard:hover{border-color:var(--border2);transform:translateY(-2px)}
+.icard .ii{font-size:26px;margin-bottom:8px}
+.icard .il{font-size:10px;color:var(--text2);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.icard .iv{font-size:14px;font-weight:700;color:var(--white)}
+.icard .is{font-size:11px;color:var(--cyan);margin-top:3px;font-family:'JetBrains Mono',monospace}
+
+/* IP BOX */
+.ipbox{background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:10px 0}
+.iprow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(0,180,255,0.06);font-size:13px}
+.iprow:last-child{border-bottom:none}
+.iprow .k{color:var(--text2)}
+.iprow .v{font-family:'JetBrains Mono',monospace;color:var(--cyan2);font-size:12px}
+
+/* HIGHLIGHT CARD */
+.hcard{background:linear-gradient(135deg,rgba(0,60,120,0.4),rgba(0,180,255,0.05));border:1px solid var(--border2);border-radius:16px;padding:22px;margin-bottom:16px}
+
+/* CHECK LIST */
+.chk{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.chk-item{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.7}
+.chk-item .ci{flex-shrink:0;margin-top:2px;font-size:15px}
+
+/* PROGRESS */
+.pbar-wrap{margin:16px 0}
+.pbar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pbar-lbl{font-size:12px;color:var(--text2);width:100px;flex-shrink:0}
+.pbar-bg{flex:1;height:5px;background:rgba(255,255,255,0.05);border-radius:10px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--cyan),#0055ff);transition:width 1.2s ease}
+.pbar-val{font-size:11px;font-weight:700;color:var(--cyan);width:30px}
+
+/* COMPARE */
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.cmp-col{border-radius:12px;padding:16px;font-size:13px;line-height:1.7}
+.cmp-yes{background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2)}
+.cmp-no{background:rgba(255,51,85,0.06);border:1px solid rgba(255,51,85,0.2)}
+.cmp-hdr{font-weight:700;font-size:13px;margin-bottom:10px}
+.cmp-yes .cmp-hdr{color:var(--green)}
+.cmp-no .cmp-hdr{color:var(--red)}
+
+/* DIV */
+.div{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:40px 0}
+
+/* ROADMAP */
+.roadmap{display:flex;flex-direction:column;gap:0;margin:20px 0;position:relative}
+.roadmap::before{content:'';position:absolute;right:19px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--cyan),rgba(0,180,255,0));z-index:0}
+.rm-item{display:flex;gap:14px;align-items:flex-start;position:relative;z-index:1;padding-bottom:20px}
+.rm-dot{width:40px;height:40px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;border:2px solid;background:var(--bg)}
+.rm-dc{border-color:#a855f7;color:#a855f7;box-shadow:0 0 20px rgba(168,85,247,0.3)}
+.rm-fs{border-color:var(--green);color:var(--green);box-shadow:0 0 20px rgba(0,229,160,0.3)}
+.rm-ps{border-color:var(--orange);color:var(--orange);box-shadow:0 0 20px rgba(255,140,0,0.3)}
+.rm-body{flex:1;padding-top:6px}
+.rm-title{font-size:15px;font-weight:700;color:var(--white)}
+.rm-desc{font-size:12px;color:var(--text2);margin-top:3px}
+
+/* FOOTER */
+.footer{text-align:center;padding:36px 0;border-top:1px solid var(--border);color:var(--text2);font-size:13px;margin-top:40px}
+.footer span{color:var(--cyan);font-weight:700}
+
+/* ANIM */
+@keyframes fd{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* MOBILE */
+@media(max-width:600px){
+  .hero{padding:44px 10px 36px}
+  .card{padding:16px}
+  .igrid{grid-template-columns:1fr 1fr}
+  .cmp{grid-template-columns:1fr}
+  table{min-width:340px}
+  thead th,tbody td{padding:9px 10px;font-size:12px}
+  .net-grid{grid-template-columns:1fr 1fr}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(0,180,255,0.2);border-radius:10px}
+
+/* TOC */
+.toc{background:var(--card2);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:36px}
+.toc-ttl{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.toc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.toc-a{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;cursor:pointer;transition:all .2s;color:var(--text);font-size:13px;font-weight:600;border:1px solid transparent;text-decoration:none}
+.toc-a:hover{background:rgba(0,180,255,0.07);border-color:var(--border);color:var(--cyan)}
+.toc-ico{width:30px;height:30px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+
+/* TAG strip */
+.tagstrip{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.ts-tag{font-size:11px;padding:4px 12px;border-radius:6px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="bg-fx"></div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">🖥️ Windows Server — Complete Guide</div>
+  <h1>الدليل الشامل<br><em>من الصفر للنهاية</em></h1>
+  <p class="hero-desc">إعداد كامل لبيئة Active Directory — DC01 · FS01 · PS01<br>مع إضافة بديل التخزين السحابي عبر NAS وAzure</p>
+  <div class="hero-chips">
+    <div class="chip"><span class="chip-dot" style="background:#a855f7"></span>DC01 — Domain Controller</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--green)"></span>FS01 — File Server</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--orange)"></span>PS01 — Print Server</div>
+    <div class="chip"><span class="chip-dot" style="background:var(--cyan)"></span>NAS / Cloud Storage</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="nbtn on" onclick="goTo('overview')">نظرة عامة</button>
+    <button class="nbtn" onclick="goTo('dc01')">DC01</button>
+    <button class="nbtn" onclick="goTo('fs01')">FS01</button>
+    <button class="nbtn" onclick="goTo('permissions')">الصلاحيات</button>
+    <button class="nbtn" onclick="goTo('ps01')">PS01</button>
+    <button class="nbtn" onclick="goTo('test')">الاختبار</button>
+    <button class="nbtn" onclick="goTo('nas')">NAS / Cloud</button>
+    <button class="nbtn" onclick="goTo('ref')">مرجع سريع</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ======================== OVERVIEW ======================== -->
+<div id="overview">
+
+  <!-- NETWORK DIAGRAM -->
+  <div class="net-diagram">
+    <div class="net-title">🌐 مخطط الشبكة</div>
+    <div class="net-grid">
+      <div class="net-node">
+        <div class="ni">🔑</div>
+        <div class="nn">DC01</div>
+        <div class="ns">Domain Controller</div>
+        <div class="nip">192.168.1.10</div>
+      </div>
+      <div class="net-node">
+        <div class="ni">🗂️</div>
+        <div class="nn">FS01</div>
+        <div class="ns">File Server</div>
+        <div class="nip">192.168.1.20</div>
+      </div>
+      <div class="net-node">
+        <div class="ni">🖨️</div>
+        <div class="nn">PS01</div>
+        <div class="ns">Print Server</div>
+        <div class="nip">192.168.1.30</div>
+      </div>
+      <div class="net-node">
+        <div class="ni">💻</div>
+        <div class="nn">Clients</div>
+        <div class="ns">أجهزة الموظفين</div>
+        <div class="nip">192.168.1.50+</div>
+      </div>
+    </div>
+    <div class="net-line">
+      <hr><span style="color:var(--text2);font-size:11px">جميع الأجهزة في نفس الشبكة — company.local</span><hr>
+    </div>
+  </div>
+
+  <!-- ROADMAP -->
+  <div class="toc">
+    <div class="toc-ttl">📋 خطة العمل</div>
+    <div class="roadmap">
+      <div class="rm-item">
+        <div class="rm-dot rm-dc">١</div>
+        <div class="rm-body">
+          <div class="rm-title">إعداد DC01 — Domain Controller</div>
+          <div class="rm-desc">تثبيت Windows Server · تعيين IP · تثبيت AD DS · إنشاء الدومين · إنشاء OUs و Users و Groups</div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot rm-fs">٢</div>
+        <div class="rm-body">
+          <div class="rm-title">إعداد FS01 — File Server</div>
+          <div class="rm-desc">تثبيت Windows Server · تعيين IP · انضمام للدومين · تثبيت File Services · إعداد المجلدات · Shares · NTFS · ABE</div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot rm-ps">٣</div>
+        <div class="rm-body">
+          <div class="rm-title">إعداد PS01 — Print Server</div>
+          <div class="rm-desc">تثبيت Windows Server · تعيين IP · انضمام للدومين · تثبيت Print Services · إضافة الطابعات · GPO</div>
+        </div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot" style="border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 20px rgba(0,180,255,0.3)">٤</div>
+        <div class="rm-body">
+          <div class="rm-title">بديل: NAS / Cloud Storage</div>
+          <div class="rm-desc">Synology NAS · Azure Files · OneDrive for Business · ربط مع Active Directory</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOC Links -->
+  <div class="toc">
+    <div class="toc-ttl">🗺️ فهرس الدليل</div>
+    <div class="toc-list">
+      <a class="toc-a" onclick="goTo('dc01')"><div class="toc-ico" style="background:rgba(168,85,247,0.1)">🔑</div>إعداد DC01</a>
+      <a class="toc-a" onclick="goTo('ad')"><div class="toc-ico" style="background:rgba(168,85,247,0.08)">👥</div>Active Directory</a>
+      <a class="toc-a" onclick="goTo('fs01')"><div class="toc-ico" style="background:rgba(0,229,160,0.1)">🗂️</div>إعداد FS01</a>
+      <a class="toc-a" onclick="goTo('permissions')"><div class="toc-ico" style="background:rgba(0,229,160,0.08)">🛡️</div>الصلاحيات</a>
+      <a class="toc-a" onclick="goTo('ps01')"><div class="toc-ico" style="background:rgba(255,140,0,0.1)">🖨️</div>إعداد PS01</a>
+      <a class="toc-a" onclick="goTo('test')"><div class="toc-ico" style="background:rgba(0,180,255,0.1)">🧪</div>الاختبار</a>
+      <a class="toc-a" onclick="goTo('nas')"><div class="toc-ico" style="background:rgba(0,180,255,0.1)">☁️</div>NAS / Cloud</a>
+      <a class="toc-a" onclick="goTo('ref')"><div class="toc-ico" style="background:rgba(0,180,255,0.08)">⚡</div>مرجع سريع</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="div"></div>
+
+<!-- ======================== DC01 ======================== -->
+<div class="sec" id="dc01">
+  <div class="sec-hdr">
+    <div class="sec-badge">١</div>
+    <div>
+      <div class="sec-ttl">إعداد DC01 — Domain Controller</div>
+      <div class="sec-sub">الخطوة الأولى والأساسية — بدون DC01 ما في دومين</div>
+    </div>
+  </div>
+
+  <div class="phase phase-dc">🔑 DC01 — 192.168.1.10</div>
+
+  <!-- Step 1: Install Windows Server -->
+  <div class="card">
+    <div class="ctitle"><div class="cicon">💿</div> تثبيت Windows Server</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">شغّل الـ VM أو الجهاز وبوّت من ISO لـ <code>Windows Server 2019/2022</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اختر اللغة وانقر <code>Next</code> ← <code>Install Now</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اختر <code>Windows Server 2022 Standard (Desktop Experience)</code> — مهم تختار Desktop Experience</div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">اقبل الـ License ← اختر <code>Custom: Install Windows only</code></div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">اختر الديسك واضغط <code>Next</code> — انتظر حتى تنتهي عملية التثبيت وإعادة التشغيل</div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">بعد الإقلاع ضع كلمة مرور قوية لـ Administrator وسجّل دخول</div></div>
+    </div>
+  </div>
+
+  <!-- Step 2: Configure IP -->
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🌐</div> تعيين IP ثابت لـ DC01</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">مهم جداً — DC01 لازم يكون عنده IP ثابت لأن باقي السيرفرات ستستخدمه كـ DNS</p>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">كليك يمين على أيقونة الشبكة في الـ Taskbar ← <code>Open Network & Internet Settings</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st"><code>Change adapter options</code> ← كليك يمين على الـ NIC ← <code>Properties</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اختر <code>Internet Protocol Version 4 (TCP/IPv4)</code> ← <code>Properties</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">اختر <code>Use the following IP address</code> وأدخل البيانات التالية:</div></div>
+    </div>
+    <div class="ipbox" style="margin-top:12px">
+      <div class="iprow"><span class="k">IP Address</span><span class="v">192.168.1.10</span></div>
+      <div class="iprow"><span class="k">Subnet Mask</span><span class="v">255.255.255.0</span></div>
+      <div class="iprow"><span class="k">Default Gateway</span><span class="v">192.168.1.1</span></div>
+      <div class="iprow"><span class="k">Preferred DNS</span><span class="v">127.0.0.1 (نفسه)</span></div>
+      <div class="iprow"><span class="k">Alternate DNS</span><span class="v">8.8.8.8</span></div>
+    </div>
+    <div class="steps" style="margin-top:12px">
+      <div class="step"><div class="sn">٥</div><div class="st">اضغط <code>OK</code> في كل النوافذ</div></div>
+    </div>
+  </div>
+
+  <!-- Step 3: Rename Server -->
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🏷️</div> تغيير اسم السيرفر</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">كليك يمين على <code>This PC</code> ← <code>Properties</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اضغط <code>Rename this PC</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اكتب: <code>DC01</code> ← اضغط <code>Next</code> ← <code>Restart Now</code></div></div>
+    </div>
+  </div>
+
+  <!-- Step 4: Install AD DS -->
+  <div class="card">
+    <div class="ctitle"><div class="cicon">⚙️</div> تثبيت دور AD DS</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">افتح <code>Server Manager</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اضغط <code>Add roles and features</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اختر <code>Role-based or feature-based installation</code> ← <code>Next</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">اختر <code>DC01</code> من القائمة ← <code>Next</code></div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">شيك على <code>Active Directory Domain Services</code> ← اضغط <code>Add Features</code></div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">اضغط <code>Next</code> حتى <code>Install</code> — انتظر حتى ينتهي</div></div>
+    </div>
+  </div>
+
+  <!-- Step 5: Promote to DC -->
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🚀</div> ترقية السيرفر إلى Domain Controller</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">بعد انتهاء التثبيت اضغط على <code>Promote this server to a domain controller</code> (في Server Manager)</div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اختر <code>Add a new forest</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">في Root domain name اكتب: <code>company.local</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">اضغط <code>Next</code></div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">اختر Forest/Domain functional level: <code>Windows Server 2016</code> أو أحدث</div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">ضع كلمة مرور قوية لـ DSRM وتذكرها جيداً</div></div>
+      <div class="step"><div class="sn">٧</div><div class="st">اضغط <code>Next</code> في كل الخطوات حتى <code>Install</code></div></div>
+      <div class="step"><div class="sn">٨</div><div class="st">السيرفر سيُعاد تشغيله تلقائياً بعد الانتهاء</div></div>
+    </div>
+    <div class="al al-t" style="margin-top:12px"><span class="al-ic">✅</span>بعد إعادة التشغيل ستلاحظ أن تسجيل الدخول أصبح بصيغة <code>COMPANY\Administrator</code> — هذا يعني نجح الإعداد</div>
+  </div>
+</div>
+
+<!-- ======================== AD ======================== -->
+<div class="sec" id="ad">
+  <div class="sec-hdr">
+    <div class="sec-badge" style="background:linear-gradient(135deg,#a855f7,#6633cc)">AD</div>
+    <div>
+      <div class="sec-ttl">إعداد Active Directory</div>
+      <div class="sec-sub">إنشاء OUs · Users · Groups</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🏢</div> إنشاء الـ Organizational Units (OUs)</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">OUs تنظّم المستخدمين والمجموعات — مثل مجلدات داخل Active Directory</p>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">افتح <code>Active Directory Users and Computers</code> من Server Manager ← Tools</div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">كليك يمين على <code>company.local</code> ← <code>New</code> ← <code>Organizational Unit</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اسمها: <code>company</code> ← اضغط <code>OK</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">افتح الـ OU الجديدة وأنشئ جوّها:</div></div>
+    </div>
+    <div class="tree" style="margin-top:14px">
+      <span class="tf">company.local</span><br>
+      <span class="tl">&nbsp;&nbsp;└──</span> <span class="tf">📁 company (OU)</span><br>
+      <span class="tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──</span> <span class="ts">📁 Users</span> <span style="color:var(--text3);font-size:11px">(OU للمستخدمين)</span><br>
+      <span class="tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──</span> <span class="tc">👤 HR (sub-OU)</span><br>
+      <span class="tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──</span> <span class="tc">👤 Finance (sub-OU)</span><br>
+      <span class="tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="tc">👤 IT (sub-OU)</span><br>
+      <span class="tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="ts">📁 Groups</span> <span style="color:var(--text3);font-size:11px">(OU للمجموعات)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">👥</div> إنشاء الـ Security Groups</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">كليك يمين على OU الـ <code>Groups</code> ← <code>New</code> ← <code>Group</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">Group name: <code>HR_Group</code> ← Group scope: <code>Global</code> ← Group type: <code>Security</code> ← <code>OK</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">كرر لإنشاء: <code>Finance_Group</code> و <code>IT_Group</code></div></div>
+    </div>
+    <div class="tw" style="margin-top:14px">
+      <table>
+        <thead><tr><th>اسم المجموعة</th><th>Group Scope</th><th>Group Type</th><th>الغرض</th></tr></thead>
+        <tbody>
+          <tr><td><span class="b bp">HR_Group</span></td><td>Global</td><td>Security</td><td>موظفو قسم HR</td></tr>
+          <tr><td><span class="b bg">Finance_Group</span></td><td>Global</td><td>Security</td><td>موظفو قسم Finance</td></tr>
+          <tr><td><span class="b bb">IT_Group</span></td><td>Global</td><td>Security</td><td>موظفو قسم IT</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">👤</div> إنشاء المستخدمين</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">كليك يمين على OU المناسبة مثل <code>Users/HR</code> ← <code>New</code> ← <code>User</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">أدخل الاسم الأول والأخير وـ User logon name مثل: <code>ahmad.ali@company.local</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اضغط <code>Next</code> ← ضع كلمة مرور ← شيك على <code>Password never expires</code> (في بيئة تجريبية) ← <code>Next</code> ← <code>Finish</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">أضف المستخدم لمجموعته: كليك يمين عليه ← <code>Add to a group</code> ← اكتب <code>HR_Group</code> ← <code>OK</code></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="div"></div>
+
+<!-- ======================== FS01 ======================== -->
+<div class="sec" id="fs01">
+  <div class="sec-hdr">
+    <div class="sec-badge" style="background:linear-gradient(135deg,var(--green),#008855)">٢</div>
+    <div>
+      <div class="sec-ttl">إعداد FS01 — File Server</div>
+      <div class="sec-sub">تثبيت · انضمام للدومين · File Services</div>
+    </div>
+  </div>
+
+  <div class="phase phase-fs">🗂️ FS01 — 192.168.1.20</div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">💿</div> تثبيت Windows Server على FS01</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:12px">نفس خطوات تثبيت DC01 تماماً — Windows Server 2022 Standard (Desktop Experience)</p>
+    <div class="al al-i"><span class="al-ic">ℹ️</span>بعد التثبيت والدخول لأول مرة، غيّر اسم الجهاز إلى <code>FS01</code> ثم أعد التشغيل قبل ما تكمل</div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🌐</div> تعيين IP ثابت لـ FS01</div>
+    <div class="ipbox">
+      <div class="iprow"><span class="k">IP Address</span><span class="v">192.168.1.20</span></div>
+      <div class="iprow"><span class="k">Subnet Mask</span><span class="v">255.255.255.0</span></div>
+      <div class="iprow"><span class="k">Default Gateway</span><span class="v">192.168.1.1</span></div>
+      <div class="iprow"><span class="k">Preferred DNS</span><span class="v">192.168.1.10 (DC01) ⚠️ مهم</span></div>
+      <div class="iprow"><span class="k">Alternate DNS</span><span class="v">8.8.8.8</span></div>
+    </div>
+    <div class="al al-w" style="margin-top:10px"><span class="al-ic">⚠️</span>Preferred DNS لازم يكون IP الـ DC01 — بدون هذا ما تقدر تنضم للدومين</div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🔗</div> انضمام FS01 للدومين</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">كليك يمين على <code>This PC</code> ← <code>Properties</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اضغط <code>Change settings</code> ← <code>Change</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اختر <code>Domain</code> واكتب: <code>company.local</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">أدخل بيانات Admin الدومين: <code>COMPANY\Administrator</code> + كلمة المرور</div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">ستظهر رسالة ترحيب "Welcome to company.local" ← اضغط <code>OK</code></div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">أعد التشغيل</div></div>
+    </div>
+    <div class="al al-t" style="margin-top:12px"><span class="al-ic">✅</span>للتأكد: افتح CMD على DC01 واكتب <code>ping FS01</code> — إذا رجعت رد يعني نجح الانضمام</div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">⚙️</div> تثبيت دور File and Storage Services</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">افتح <code>Server Manager</code> على FS01</div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اضغط <code>Add roles and features</code> ← <code>Next</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اختر <code>FS01</code> ← <code>Next</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">شيك على <code>File and Storage Services</code> ← افتحه وشيك على <code>File and iSCSI Services</code> ← شيك على <code>File Server</code></div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">اضغط <code>Next</code> ← <code>Install</code></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">📁</div> إنشاء هيكل المجلدات</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">افتح <code>File Explorer</code> على FS01</div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">روح على <code>C:\</code> مباشرة وأنشئ مجلد: <code>Shared</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">افتح Shared وأنشئ جوّه: <code>HR</code> · <code>Finance</code> · <code>IT</code></div></div>
+    </div>
+    <div class="tree" style="margin-top:14px">
+      <span class="tl">C:\</span><br>
+      <span class="tl">&nbsp;&nbsp;└──</span> <span class="tf">📁 Shared</span><br>
+      <span class="tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──</span> <span class="ts">📁 HR</span><br>
+      <span class="tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──</span> <span class="ts">📁 Finance</span><br>
+      <span class="tl">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="ts">📁 IT</span>
+    </div>
+    <div class="al al-w" style="margin-top:12px"><span class="al-ic">⚠️</span>المجلد لازم على <code>C:\</code> مباشرة — Desktop أو أي مكان ثاني بيسبب مشاكل في الصلاحيات</div>
+  </div>
+
+</div>
+
+<div class="div"></div>
+
+<!-- ======================== PERMISSIONS ======================== -->
+<div class="sec" id="permissions">
+  <div class="sec-hdr">
+    <div class="sec-badge" style="background:linear-gradient(135deg,var(--green),#005533)">🛡️</div>
+    <div>
+      <div class="sec-ttl">إعداد الصلاحيات الكاملة</div>
+      <div class="sec-sub">Share Permissions · NTFS · ABE</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🔗</div> Share Permissions — المجلد الرئيسي Shared</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">كليك يمين على <code>C:\Shared</code> ← <code>Properties</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">تبويب <code>Sharing</code> ← <code>Advanced Sharing</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">✅ شيك على <code>Share this folder</code> ← Share name: <code>Shared</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">اضغط <code>Permissions</code> ← احذف <code>Everyone</code> ❌</div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">اضغط <code>Add</code> ← اضغط <code>Locations</code> ← اختر <code>company.local</code> ← اكتب <code>Authenticated Users</code> ← <code>Check Names</code> ← <code>OK</code></div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">اعطِها <code>Read</code> فقط ← <code>OK</code></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🏠</div> NTFS — المجلد الرئيسي Shared</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">تبويب <code>Security</code> ← <code>Advanced</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اضغط <code>Disable Inheritance</code> ← اختر <code>Convert inherited permissions into explicit permissions</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">احذف كل الـ entries ما عدا <code>SYSTEM</code> و <code>Administrators</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">اضغط <code>Add</code> ← <code>Select a principal</code> ← اكتب <code>COMPANY\Authenticated Users</code> ← <code>OK</code></div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">في <code>Applies to</code> اختر <code>This folder only</code> — ثم شيك: <code>Read & Execute</code> + <code>List folder contents</code> + <code>Read</code></div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">اضغط <code>OK</code> ← <code>Apply</code> ← <code>OK</code></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">📂</div> NTFS — المجلدات الفرعية (HR / Finance / IT)</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">كرر على كل مجلد فرعي — مثال على HR:</p>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">كليك يمين على <code>HR</code> ← <code>Properties</code> ← <code>Security</code> ← <code>Advanced</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اضغط <code>Disable Inheritance</code> ← <code>Remove all inherited permissions from this object</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">أضف <code>SYSTEM</code>: Full Control ← This folder, subfolders and files</div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">أضف <code>Administrators</code>: Full Control ← This folder, subfolders and files</div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">أضف <code>COMPANY\HR_Group</code>: Read & Execute ← This folder, subfolders and files</div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">اضغط <code>OK</code> ← <code>Apply</code> ← <code>OK</code></div></div>
+    </div>
+    <div class="al al-w" style="margin-top:12px"><span class="al-ic">⚠️</span>لا تضيف Authenticated Users على المجلدات الفرعية أبداً — ABE سيتولى الإخفاء</div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">📊</div> جدول الصلاحيات الكامل</div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>المجلد</th><th>المجموعة</th><th>الصلاحية</th><th>يطبق على</th></tr></thead>
+        <tbody>
+          <tr><td><span class="b bb">Shared</span></td><td>Authenticated Users</td><td><span class="b by">Read & Execute</span></td><td>This folder only</td></tr>
+          <tr><td><span class="b bb">Shared</span></td><td>SYSTEM / Admins</td><td><span class="b br">Full Control</span></td><td>This folder, subfolders and files</td></tr>
+          <tr><td><span class="b bp">HR</span></td><td>HR_Group</td><td><span class="b by">Read & Execute</span></td><td>This folder, subfolders and files</td></tr>
+          <tr><td><span class="b bp">HR</span></td><td>SYSTEM / Admins</td><td><span class="b br">Full Control</span></td><td>This folder, subfolders and files</td></tr>
+          <tr><td><span class="b bg">Finance</span></td><td>Finance_Group</td><td><span class="b by">Read & Execute</span></td><td>This folder, subfolders and files</td></tr>
+          <tr><td><span class="b bg">Finance</span></td><td>SYSTEM / Admins</td><td><span class="b br">Full Control</span></td><td>This folder, subfolders and files</td></tr>
+          <tr><td><span class="b bb">IT</span></td><td>IT_Group</td><td><span class="b by">Read & Execute</span></td><td>This folder, subfolders and files</td></tr>
+          <tr><td><span class="b bb">IT</span></td><td>SYSTEM / Admins</td><td><span class="b br">Full Control</span></td><td>This folder, subfolders and files</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">👁️</div> تفعيل ABE — Access-Based Enumeration</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">افتح <code>Server Manager</code> على FS01</div></div>
+      <div class="step"><div class="sn">٢</div><div class="st"><code>File and Storage Services</code> ← <code>Shares</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">كليك يمين على <code>Shared</code> ← <code>Properties</code> ← تبويب <code>Settings</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">✅ شيك على <code>Enable access-based enumeration</code> ← <code>OK</code></div></div>
+    </div>
+    <div class="al al-t" style="margin-top:12px"><span class="al-ic">✅</span>التحقق: <code>Get-SmbShare -Name "Shared" | Select FolderEnumerationMode</code> — النتيجة يجب أن تكون <code>AccessBased</code></div>
+  </div>
+
+</div>
+
+<div class="div"></div>
+
+<!-- ======================== PS01 ======================== -->
+<div class="sec" id="ps01">
+  <div class="sec-hdr">
+    <div class="sec-badge" style="background:linear-gradient(135deg,var(--orange),#993300)">٣</div>
+    <div>
+      <div class="sec-ttl">إعداد PS01 — Print Server</div>
+      <div class="sec-sub">تثبيت · انضمام · طابعات · GPO</div>
+    </div>
+  </div>
+
+  <div class="phase phase-ps">🖨️ PS01 — 192.168.1.30</div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">💿</div> تثبيت وإعداد PS01</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">ثبّت Windows Server 2022 (Desktop Experience) — نفس خطوات DC01</div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">غيّر اسم الجهاز إلى <code>PS01</code> وأعد التشغيل</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🌐</div> IP ثابت لـ PS01</div>
+    <div class="ipbox">
+      <div class="iprow"><span class="k">IP Address</span><span class="v">192.168.1.30</span></div>
+      <div class="iprow"><span class="k">Subnet Mask</span><span class="v">255.255.255.0</span></div>
+      <div class="iprow"><span class="k">Default Gateway</span><span class="v">192.168.1.1</span></div>
+      <div class="iprow"><span class="k">Preferred DNS</span><span class="v">192.168.1.10 (DC01) ⚠️</span></div>
+      <div class="iprow"><span class="k">Alternate DNS</span><span class="v">8.8.8.8</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🔗</div> انضمام PS01 للدومين</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">كليك يمين على <code>This PC</code> ← <code>Properties</code> ← <code>Change settings</code> ← <code>Change</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اختر <code>Domain</code> ← اكتب <code>company.local</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">أدخل بيانات Admin الدومين ← أعد التشغيل</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">⚙️</div> تثبيت دور Print and Document Services</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">افتح <code>Server Manager</code> ← <code>Add roles and features</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">اختر <code>PS01</code> ← شيك على <code>Print and Document Services</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">في Role Services شيك على <code>Print Server</code> ← <code>Install</code></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🖨️</div> إضافة ومشاركة الطابعة</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">افتح <code>Print Management</code> من Server Manager ← Tools</div></div>
+      <div class="step"><div class="sn">٢</div><div class="st"><code>Print Servers</code> ← <code>PS01</code> ← <code>Printers</code> ← كليك يمين ← <code>Add Printer</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">اختر <code>Add a TCP/IP or Web Services Printer</code> ← أدخل IP الطابعة</div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">اختر الـ Driver ← اعطِ الطابعة اسماً مثل <code>HP-LaserJet-HR</code></div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">كليك يمين على الطابعة ← <code>Printer Properties</code> ← تبويب <code>Sharing</code> ← شيك على <code>Share this printer</code> ← Share name: <code>HR-Printer</code></div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">تبويب <code>Security</code> ← احذف <code>Everyone</code> ← أضف <code>COMPANY\HR_Group</code> ← اعطيها <code>Print</code> فقط</div></div>
+      <div class="step"><div class="sn">٧</div><div class="st">اضغط <code>Apply</code> ← <code>OK</code></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">📡</div> نشر الطابعة عبر Group Policy</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">افتح <code>Group Policy Management</code> على DC01</div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">كليك يمين على <code>company.local</code> ← <code>Create a GPO in this domain</code> ← اسمها: <code>Deploy-HR-Printer</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">كليك يمين على الـ GPO ← <code>Edit</code></div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">روح: <code>User Configuration</code> ← <code>Preferences</code> ← <code>Control Panel Settings</code> ← <code>Printers</code></div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">كليك يمين ← <code>New</code> ← <code>Shared Printer</code> ← Path: <code>\\PS01\HR-Printer</code> ← <code>OK</code></div></div>
+      <div class="step"><div class="sn">٦</div><div class="st">في Group Policy Management اربط الـ GPO بـ OU الـ HR: اسحب الـ GPO على OU أو كليك يمين على الـ OU ← <code>Link an Existing GPO</code></div></div>
+    </div>
+    <div class="al al-t" style="margin-top:12px"><span class="al-ic">💡</span>موظف HR سيشوف الطابعة تلقائياً بعد تسجيل الدخول — بدون أي إعداد يدوي</div>
+  </div>
+
+</div>
+
+<div class="div"></div>
+
+<!-- ======================== TEST ======================== -->
+<div class="sec" id="test">
+  <div class="sec-hdr">
+    <div class="sec-badge" style="background:linear-gradient(135deg,#00aaff,#005599)">🧪</div>
+    <div>
+      <div class="sec-ttl">الاختبار الكامل</div>
+      <div class="sec-sub">تأكيد كل شي يشتغل صح</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🔍</div> اختبار File Server</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">من جهاز موظف مرتبط بالدومين، سجّل دخول بحساب HR مثل <code>ahmad.ali</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">افتح <code>Run</code> (Win+R) واكتب: <code>\\FS01\Shared</code></div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">النتيجة المتوقعة: يشوف مجلد <code>HR</code> فقط ✅</div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">سجّل خروج وادخل بحساب IT — يجب أن يشوف <code>IT</code> فقط ✅</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🖨️</div> اختبار Print Server</div>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">من جهاز موظف HR، افتح <code>Control Panel</code> ← <code>Devices and Printers</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">يجب أن تظهر <code>HR-Printer</code> تلقائياً عبر GPO ✅</div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">كليك يمين ← <code>Print test page</code> وتأكد وصلت</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🛠️</div> أوامر استكشاف الأخطاء</div>
+    <div class="cb"><span class="lang">PowerShell</span><button class="cpbtn" onclick="cp(this)">نسخ</button>
+<pre># مسح Kerberos Token (تطبيق الصلاحيات فوراً)
+klist purge
+
+# تحديث Group Policy
+gpupdate /force
+
+# التحقق من ABE
+Get-SmbShare -Name "Shared" | Select FolderEnumerationMode
+
+# اختبار الاتصال بالسيرفرات
+ping DC01
+ping FS01
+ping PS01
+
+# التحقق من عضوية الدومين
+systeminfo | findstr /B /C:"Domain"</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">⚠️</div> جدول المشاكل الشائعة</div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>المشكلة</th><th>السبب</th><th>الحل</th></tr></thead>
+        <tbody>
+          <tr><td>يشوف كل المجلدات</td><td>ABE غير مفعّل</td><td>فعّل ABE من Server Manager على FS01</td></tr>
+          <tr><td>Access Denied</td><td>NTFS غلط</td><td>تأكد الصلاحيات على المجلد</td></tr>
+          <tr><td>ما يقدر ينضم للدومين</td><td>DNS غلط</td><td>Preferred DNS يجب أن يكون IP الـ DC01</td></tr>
+          <tr><td>Authenticated Users غير موجودة</td><td>بحث في Local</td><td>Locations ← اختر company.local</td></tr>
+          <tr><td>الطابعة ما ظهرت</td><td>GPO لم يُطبّق</td><td>gpupdate /force ثم سجّل خروج ودخول</td></tr>
+          <tr><td>الملفات ما تحفظ</td><td>Read فقط بدل Modify</td><td>غيّر الصلاحية إلى Modify للمجموعة</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="div"></div>
+
+<!-- ======================== NAS / CLOUD ======================== -->
+<div class="sec" id="nas">
+  <div class="sec-hdr">
+    <div class="sec-badge" style="background:linear-gradient(135deg,#00b4ff,#003388)">☁️</div>
+    <div>
+      <div class="sec-ttl">بديل FS01 — NAS وCloud Storage</div>
+      <div class="sec-sub">بدل تخزين الملفات على FS01 محلياً</div>
+    </div>
+  </div>
+
+  <div class="phase phase-nas">☁️ بديل التخزين الخارجي</div>
+
+  <!-- WHY -->
+  <div class="hcard">
+    <div class="ctitle" style="color:var(--cyan2)">💡 ليش بديل FS01؟</div>
+    <div class="cmp">
+      <div class="cmp-col cmp-yes">
+        <div class="cmp-hdr">✅ مزايا NAS/Cloud</div>
+        <div class="chk">
+          <div class="chk-item"><span class="ci">✅</span>لا تحتاج VM إضافي أو سيرفر</div>
+          <div class="chk-item"><span class="ci">✅</span>احتياطي تلقائي وأمان أعلى</div>
+          <div class="chk-item"><span class="ci">✅</span>وصول من أي مكان في العالم</div>
+          <div class="chk-item"><span class="ci">✅</span>توسيع التخزين بسهولة</div>
+          <div class="chk-item"><span class="ci">✅</span>تكلفة أقل على المدى البعيد</div>
+        </div>
+      </div>
+      <div class="cmp-col cmp-no">
+        <div class="cmp-hdr">❌ عيوب FS01 التقليدي</div>
+        <div class="chk">
+          <div class="chk-item"><span class="ci">❌</span>يحتاج VM أو سيرفر فيزيائي</div>
+          <div class="chk-item"><span class="ci">❌</span>يحتاج صيانة وتحديثات</div>
+          <div class="chk-item"><span class="ci">❌</span>لا وصول من خارج الشبكة</div>
+          <div class="chk-item"><span class="ci">❌</span>محدود بسعة الهارد</div>
+          <div class="chk-item"><span class="ci">❌</span>إذا تعطّل ضاعت الملفات</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION 1: SYNOLOGY NAS -->
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🔲</div> الخيار الأول: Synology NAS</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">NAS = Network Attached Storage — جهاز تخزين يتصل بالشبكة ويدعم LDAP/Active Directory</p>
+
+    <div class="card" style="border-color:rgba(168,85,247,0.2);margin-bottom:12px">
+      <div class="ctitle" style="color:#c084fc;font-size:13px">الخطوة ١ — إعداد Synology NAS</div>
+      <div class="steps">
+        <div class="step"><div class="sn">١</div><div class="st">ادخل على واجهة NAS عبر المتصفح: <code>http://[IP-NAS]:5000</code></div></div>
+        <div class="step"><div class="sn">٢</div><div class="st">أكمل معالج الإعداد الأولي واختر اسم للـ NAS</div></div>
+        <div class="step"><div class="sn">٣</div><div class="st">عيّن IP ثابت للـ NAS مثل: <code>192.168.1.40</code></div></div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:rgba(168,85,247,0.2);margin-bottom:12px">
+      <div class="ctitle" style="color:#c084fc;font-size:13px">الخطوة ٢ — ربط NAS بـ Active Directory</div>
+      <div class="steps">
+        <div class="step"><div class="sn">١</div><div class="st">في Synology DSM افتح <code>Control Panel</code> ← <code>Domain/LDAP</code></div></div>
+        <div class="step"><div class="sn">٢</div><div class="st">اختر <code>Domain</code> ← اكتب: <code>company.local</code></div></div>
+        <div class="step"><div class="sn">٣</div><div class="st">أدخل بيانات Admin الدومين ← اضغط <code>Apply</code></div></div>
+        <div class="step"><div class="sn">٤</div><div class="st">الآن يمكنك إضافة مستخدمي الدومين على الـ NAS مباشرة</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:rgba(168,85,247,0.2);margin-bottom:12px">
+      <div class="ctitle" style="color:#c084fc;font-size:13px">الخطوة ٣ — إنشاء Shared Folders على NAS</div>
+      <div class="steps">
+        <div class="step"><div class="sn">١</div><div class="st">افتح <code>Control Panel</code> ← <code>Shared Folder</code> ← <code>Create</code></div></div>
+        <div class="step"><div class="sn">٢</div><div class="st">اسم المجلد: <code>HR</code> ← اضغط <code>Next</code></div></div>
+        <div class="step"><div class="sn">٣</div><div class="st">في Permissions أضف <code>COMPANY\HR_Group</code> ← اعطيها <code>Read/Write</code></div></div>
+        <div class="step"><div class="sn">٤</div><div class="st">كرر لـ <code>Finance</code> و <code>IT</code></div></div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:rgba(168,85,247,0.2)">
+      <div class="ctitle" style="color:#c084fc;font-size:13px">الخطوة ٤ — ربط NAS بالـ Clients عبر GPO</div>
+      <div class="steps">
+        <div class="step"><div class="sn">١</div><div class="st">على DC01 افتح <code>Group Policy Management</code> ← أنشئ GPO جديد: <code>Map-NAS-HR</code></div></div>
+        <div class="step"><div class="sn">٢</div><div class="st">اضغط Edit ← <code>User Configuration</code> ← <code>Preferences</code> ← <code>Windows Settings</code> ← <code>Drive Maps</code></div></div>
+        <div class="step"><div class="sn">٣</div><div class="st">كليك يمين ← <code>New</code> ← <code>Mapped Drive</code></div></div>
+        <div class="step"><div class="sn">٤</div><div class="st">Location: <code>\\192.168.1.40\HR</code> ← Drive Letter: <code>H:</code> ← Label: <code>HR Drive</code></div></div>
+        <div class="step"><div class="sn">٥</div><div class="st">في تبويب <code>Common</code> شيك على <code>Item-level targeting</code> ← <code>Targeting</code> ← أضف شرط: Security Group = HR_Group</div></div>
+        <div class="step"><div class="sn">٦</div><div class="st">اربط الـ GPO بـ company.local</div></div>
+      </div>
+      <div class="al al-t" style="margin-top:12px"><span class="al-ic">✅</span>الآن موظف HR سيجد Drive H: مرتبط تلقائياً بمجلد HR على الـ NAS بمجرد تسجيل الدخول</div>
+    </div>
+  </div>
+
+  <!-- OPTION 2: AZURE FILES -->
+  <div class="card">
+    <div class="ctitle"><div class="cicon">☁️</div> الخيار الثاني: Azure Files</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">خدمة Microsoft السحابية — يمكن ربطها مع Active Directory On-Premises</p>
+
+    <div class="card" style="border-color:rgba(0,180,255,0.2);margin-bottom:12px">
+      <div class="ctitle" style="color:var(--cyan);font-size:13px">الخطوة ١ — إنشاء Storage Account على Azure</div>
+      <div class="steps">
+        <div class="step"><div class="sn">١</div><div class="st">ادخل على <code>portal.azure.com</code> وسجّل دخول</div></div>
+        <div class="step"><div class="sn">٢</div><div class="st">ابحث عن <code>Storage accounts</code> ← <code>Create</code></div></div>
+        <div class="step"><div class="sn">٣</div><div class="st">اختر Subscription والـ Resource Group ← اعطِ اسماً: <code>companystorage</code></div></div>
+        <div class="step"><div class="sn">٤</div><div class="st">Region: اختر الأقرب ← Performance: <code>Standard</code> ← <code>Review + Create</code></div></div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:rgba(0,180,255,0.2);margin-bottom:12px">
+      <div class="ctitle" style="color:var(--cyan);font-size:13px">الخطوة ٢ — إنشاء File Share</div>
+      <div class="steps">
+        <div class="step"><div class="sn">١</div><div class="st">افتح الـ Storage Account ← من القائمة اليسرى اختر <code>File shares</code></div></div>
+        <div class="step"><div class="sn">٢</div><div class="st">اضغط <code>+ File share</code> ← اسمه: <code>hr-files</code> ← Tier: <code>Transaction optimized</code></div></div>
+        <div class="step"><div class="sn">٣</div><div class="st">كرر لـ <code>finance-files</code> و <code>it-files</code></div></div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:rgba(0,180,255,0.2);margin-bottom:12px">
+      <div class="ctitle" style="color:var(--cyan);font-size:13px">الخطوة ٣ — ربط Azure Files بـ AD On-Premises</div>
+      <div class="cb"><span class="lang">PowerShell — DC01</span><button class="cpbtn" onclick="cp(this)">نسخ</button>
+<pre># ثبّت AzFilesHybrid module
+Install-Module -Name AzFilesHybrid -Force
+
+# سجّل دخول لـ Azure
+Connect-AzAccount
+
+# فعّل AD Authentication
+Join-AzStorageAccountForAuth `
+  -ResourceGroupName "your-resource-group" `
+  -StorageAccountName "companystorage" `
+  -DomainAccountType "ComputerAccount" `
+  -OrganizationalUnitDistinguishedName "OU=Computers,DC=company,DC=local"</pre></div>
+    </div>
+
+    <div class="card" style="border-color:rgba(0,180,255,0.2)">
+      <div class="ctitle" style="color:var(--cyan);font-size:13px">الخطوة ٤ — ربط Drive عبر GPO</div>
+      <div class="steps">
+        <div class="step"><div class="sn">١</div><div class="st">في Azure Portal اضغط على الـ File Share ← <code>Connect</code></div></div>
+        <div class="step"><div class="sn">٢</div><div class="st">اختر <code>Active Directory</code> ← انسخ سكريبت PowerShell اللي يظهر</div></div>
+        <div class="step"><div class="sn">٣</div><div class="st">أو استخدم UNC Path في GPO Drive Maps: <code>\\companystorage.file.core.windows.net\hr-files</code></div></div>
+      </div>
+      <div class="al al-i" style="margin-top:12px"><span class="al-ic">ℹ️</span>Azure Files يوفر إمكانية الوصول من أي مكان في العالم مع نفس صلاحيات الـ AD</div>
+    </div>
+  </div>
+
+  <!-- OPTION 3: ONEDRIVE -->
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🔵</div> الخيار الثالث: OneDrive for Business (Microsoft 365)</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">الأسهل والأكثر انتشاراً في الشركات الصغيرة والمتوسطة</p>
+    <div class="steps">
+      <div class="step"><div class="sn">١</div><div class="st">اشترك بخطة Microsoft 365 Business على <code>microsoft.com/microsoft-365</code></div></div>
+      <div class="step"><div class="sn">٢</div><div class="st">ادخل على <code>admin.microsoft.com</code> ← أضف المستخدمين بنفس اسماء الدومين</div></div>
+      <div class="step"><div class="sn">٣</div><div class="st">استخدم <code>SharePoint</code> لإنشاء مجلدات مشتركة لكل قسم</div></div>
+      <div class="step"><div class="sn">٤</div><div class="st">ثبّت <code>OneDrive Sync Client</code> على أجهزة الموظفين</div></div>
+      <div class="step"><div class="sn">٥</div><div class="st">عبر Group Policy تقدر تفرض الـ Sync تلقائياً — GPO: <code>Silently configure OneDrive using Windows 10 or later</code></div></div>
+    </div>
+    <div class="tw" style="margin-top:14px">
+      <table>
+        <thead><tr><th>الخيار</th><th>الأنسب لـ</th><th>التكلفة</th><th>وصول خارجي</th></tr></thead>
+        <tbody>
+          <tr><td><span class="b bp">Synology NAS</span></td><td>شركات متوسطة-كبيرة</td><td>🟡 متوسطة (شراء جهاز)</td><td>✅ ممكن</td></tr>
+          <tr><td><span class="b bb">Azure Files</span></td><td>شركات تستخدم Azure</td><td>🟡 حسب الاستخدام</td><td>✅ دائماً</td></tr>
+          <tr><td><span class="b bg">OneDrive M365</span></td><td>شركات صغيرة-متوسطة</td><td>🟢 منخفضة (اشتراك شهري)</td><td>✅ دائماً</td></tr>
+          <tr><td><span class="b by">FS01 تقليدي</span></td><td>شبكة محلية فقط</td><td>🟢 مجانية (سيرفر موجود)</td><td>❌ يحتاج VPN</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="div"></div>
+
+<!-- ======================== REF ======================== -->
+<div class="sec" id="ref">
+  <div class="sec-hdr">
+    <div class="sec-badge" style="background:linear-gradient(135deg,#00aaff,#004488)">⚡</div>
+    <div>
+      <div class="sec-ttl">مرجع سريع</div>
+      <div class="sec-sub">أوامر · IPs · خلاصة</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">🌐</div> جدول IPs والأدوار</div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>السيرفر</th><th>IP</th><th>الدور</th><th>DNS يشير إلى</th></tr></thead>
+        <tbody>
+          <tr><td><span class="b bp">DC01</span></td><td style="font-family:'JetBrains Mono',monospace">192.168.1.10</td><td>Domain Controller + DNS</td><td>127.0.0.1 (نفسه)</td></tr>
+          <tr><td><span class="b bg">FS01</span></td><td style="font-family:'JetBrains Mono',monospace">192.168.1.20</td><td>File Server</td><td>192.168.1.10 (DC01)</td></tr>
+          <tr><td><span class="b bo">PS01</span></td><td style="font-family:'JetBrains Mono',monospace">192.168.1.30</td><td>Print Server</td><td>192.168.1.10 (DC01)</td></tr>
+          <tr><td><span class="b bb">NAS</span></td><td style="font-family:'JetBrains Mono',monospace">192.168.1.40</td><td>Network Storage</td><td>192.168.1.10 (DC01)</td></tr>
+          <tr><td>Clients</td><td style="font-family:'JetBrains Mono',monospace">192.168.1.50+</td><td>أجهزة الموظفين</td><td>192.168.1.10 (DC01)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">⚡</div> أوامر أساسية</div>
+    <div class="cb"><span class="lang">CMD / PowerShell</span><button class="cpbtn" onclick="cp(this)">نسخ</button>
+<pre># مسح Kerberos Token
+klist purge
+
+# تحديث Group Policy
+gpupdate /force
+
+# فحص الاتصال
+ping DC01 | ping FS01 | ping PS01
+
+# فحص انضمام الدومين
+systeminfo | findstr "Domain"
+
+# عرض Share Permissions
+Get-SmbShare -Name "Shared" | Get-SmbShareAccess
+
+# فحص ABE
+Get-SmbShare -Name "Shared" | Select FolderEnumerationMode
+
+# فحص أعضاء مجموعة
+Get-ADGroupMember -Identity "HR_Group"
+
+# الوصول للمجلدات المشتركة
+\\FS01\Shared
+
+# الوصول للطابعة
+\\PS01\HR-Printer</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle"><div class="cicon">✅</div> قائمة التحقق النهائية</div>
+    <div class="chk">
+      <div class="chk-item"><span class="ci">🔑</span><span>DC01: مثبّت ومُرقّى إلى Domain Controller — domain: company.local</span></div>
+      <div class="chk-item"><span class="ci">👥</span><span>OUs منشأة — HR_Group / Finance_Group / IT_Group موجودة</span></div>
+      <div class="chk-item"><span class="ci">👤</span><span>المستخدمون مضافون لمجموعاتهم الصحيحة</span></div>
+      <div class="chk-item"><span class="ci">🗂️</span><span>FS01: منضم للدومين — مجلدات C:\Shared\HR,Finance,IT منشأة</span></div>
+      <div class="chk-item"><span class="ci">🔗</span><span>Share Permissions: Authenticated Users ← Read فقط</span></div>
+      <div class="chk-item"><span class="ci">🛡️</span><span>NTFS Permissions: كل مجلد فرعي معزول لمجموعته فقط</span></div>
+      <div class="chk-item"><span class="ci">👁️</span><span>ABE مفعّل على الـ Share</span></div>
+      <div class="chk-item"><span class="ci">🖨️</span><span>PS01: منضم للدومين — Print Server مثبّت — طابعات مُشاركة</span></div>
+      <div class="chk-item"><span class="ci">📡</span><span>GPO للطابعات مُنشأة ومرتبطة بالـ OUs المناسبة</span></div>
+      <div class="chk-item"><span class="ci">🧪</span><span>تم الاختبار: كل موظف يشوف مجلده فقط ✅</span></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>دليل <span>Windows Server</span> الشامل — DC01 · FS01 · PS01 · NAS · Azure</p>
+  <p style="margin-top:6px;font-size:11px;opacity:0.4">company.local · Active Directory · NTFS · ABE · Group Policy · 2026</p>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+function goTo(id){
+  const el=document.getElementById(id);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'start'})}
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
+  event.target.classList.add('on');
+}
+
+function cp(btn){
+  const txt=btn.nextElementSibling.textContent;
+  navigator.clipboard.writeText(txt.trim()).then(()=>{
+    btn.textContent='✓ تم';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='نسخ';btn.classList.remove('ok')},2000);
+  });
+}
+
+// Scroll spy
+const ids=['overview','dc01','ad','fs01','permissions','ps01','test','nas','ref'];
+const btns=document.querySelectorAll('.nbtn');
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const i=ids.indexOf(e.target.id);
+      if(i>-1){btns.forEach(b=>b.classList.remove('on'));if(btns[Math.min(i,btns.length-1)])btns[Math.min(i,btns.length-1)].classList.add('on')}
+    }
+  });
+},{threshold:0.2});
+ids.forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el)});
+
+// Animate on scroll
+const aobs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)'}
+  });
+},{threshold:0.05});
+document.querySelectorAll('.card,.sec,.hcard').forEach(el=>{
+  el.style.opacity='0';el.style.transform='translateY(18px)';
+  el.style.transition='opacity .5s ease, transform .5s ease';
+  aobs.observe(el);
+});
+</script>
+</body>
+</html>
